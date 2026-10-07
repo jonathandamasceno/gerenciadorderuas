@@ -535,9 +535,9 @@ try:
 
     spx_uk_atualizado = mudar_secret_github(
 
-        owner="iagofroes",
+        owner="jonathandamasceno",
 
-        repo="spx-collector",
+        repo="gerenciadorderuas",
 
         secret_name="SPX_UK",
 
@@ -554,9 +554,9 @@ try:
 
     spx_uid_atualizado = mudar_secret_github(
 
-        owner="iagofroes",
+        owner="jonathandamasceno",
 
-        repo="spx-collector",
+        repo="gerenciadorderuas",
 
         secret_name="SPX_UID",
 
