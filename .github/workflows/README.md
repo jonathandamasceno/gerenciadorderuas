@@ -1,7 +1,7 @@
 # Workflow SPX — Staging Areas
 
 ## O que faz
-Executa `main.py` diariamente às 09:00 no horário de Brasília (12:00 UTC), e também pode ser iniciado manualmente pela aba **Actions** do GitHub.
+Executa `main.py` e `inbound.py` diariamente às 09:00 no horário de Brasília (12:00 UTC), e também pode ser iniciado manualmente pela aba **Actions** do GitHub.
 
 ## Configurar no GitHub
 
@@ -22,8 +22,9 @@ Crie estes secrets (os valores não devem ser colocados no código):
 Em **Variables**, configure:
 - `SPREADSHEET_ID`: ID da planilha de destino.
 - `SHEET_NAME`: nome da aba, por exemplo `Sheet1`.
+- `SHEET_NAME2`: nome da aba secundária, por exemplo `Sheet1`.
 
-Se não definir as duas variables da planilha, o script usa os valores padrão que estão em `main.py`.
+Se não definir as duas variables da planilha, o script usa os valores padrão que estão em `main.py` e em `inbound.py`.
 
 ## Permissões do Google Sheets
 Compartilhe a planilha com o e-mail `client_email` presente no JSON da conta de serviço e conceda permissão de edição. Ative a Google Sheets API no projeto Google Cloud dessa conta.
