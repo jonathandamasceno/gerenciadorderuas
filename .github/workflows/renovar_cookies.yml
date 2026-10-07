@@ -1,0 +1,43 @@
+name: Renovar Cookies SPX
+
+on:
+  schedule:
+    # Executa todos os dias à meia-noite UTC
+    - cron: "0 3 * * *" 
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: renovar-cookies
+  cancel-in-progress: false
+
+jobs:
+  renovar-cookies:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Executar automação
+        env:
+          SPX_USERNAME: ${{ secrets.SPX_USERNAME }}
+          SPX_PASSWORD: ${{ secrets.SPX_PASSWORD }}
+          GITHUB_PAT: ${{ secrets.GH_PAT }}
+          SEATALK_WEBHOOK: ${{ secrets.SEATALK_WEBHOOK }}
+        run: |
+          python renovar_cookies.py
