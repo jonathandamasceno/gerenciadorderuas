@@ -1,0 +1,44 @@
+name: SPX - Staging Areas Inbound
+
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: spx-staging-areas
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Executar coleta e atualizar Google Sheets
+        env:
+          SPX_UID: ${{ secrets.SPX_UID }}
+          SPX_UK: ${{ secrets.SPX_UK }}
+          SPX_CSRFTOKEN: ${{ secrets.SPX_CSRFTOKEN }}
+          SPX_CID: ${{ secrets.SPX_CID }}
+          SPX_ST: ${{ secrets.SPX_ST }}
+          SPX_SP_ST: ${{ secrets.SPX_SP_ST }}
+          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+          SPREADSHEET_ID: ${{ vars.SPREADSHEET_ID }}
+          SHEET_NAME: ${{ vars.SHEET_NAME2 }}
+        run: python inbound.py
