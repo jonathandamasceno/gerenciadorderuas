@@ -143,52 +143,23 @@ adicionar_cookie(
 # CAMPOS QUE SERÃO ENVIADOS PARA A SHEETS
 # ============================================================
 
+
 CAMPOS = {
-
-    "Staging Area Name":
-        "staging_area_name",
-
-    "Priority":
-        "priority",
-
-    "TO Destination":
-        "to_destination",
-
-    "Sorting Plan Group":
-        "sorting_plan_group_list",
-
-    "Capacity":
-        "capacity",
-
-    "No. of Cages":
-        "cage_quantity",
-
-    "No.of TOs":
-        "transport_order_quantity",
-
-    "No.of Loose Orders":
-        "loose_order_quantity",
-
-    "Total Orders":
-        "total_order_quantity",
-
-    "Occupancy Percentage":
-        "occupancy_percentage",
-
-    "Staged Duration":
-        "staging_duration_time",
-
-    "Link Camera":
-        "linked_camera",
-
-    "Status":
-        "staging_area_status",
-
-    "Editor":
-        "operator",
-
-    "Update Time":
-        "mtime",
+    "Staging Area Name": "area_name",
+    "Priority": "priority",
+    "TO Destination": "to_destination",
+    "Sorting Plan Group": "staging_group_name",
+    "Capacity": "capacity",
+    "No. of Cages": "cage_quantity",
+    "No. of TOs": "to_quantity",
+    "No. of Loose Orders": "loose_order_quantity",
+    "Total Orders": "total_order_quantity",
+    "Occupancy Percentage": "occupy_percentage",
+    "Staged Duration": "staging_duration_time",
+    "Link Camera": "linked_camera",
+    "Status": "status",
+    "Editor": "operator",
+    "Update Time": "update_time",
 }
 
 
