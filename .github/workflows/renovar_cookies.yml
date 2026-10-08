@@ -1,9 +1,11 @@
 name: Renovar Cookies SPX
 
 on:
-  schedule:
-    # Executa todos os dias à meia-noite UTC
-    - cron: "0 3 * * *" 
+  workflow_run:
+    workflows:
+      - "SPX - Staging Areas Inbound"
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
@@ -15,6 +17,7 @@ concurrency:
 
 jobs:
   renovar-cookies:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
