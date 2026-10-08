@@ -2,7 +2,7 @@ name: SPX - Atualizar Staging Areas
 
 on:
   schedule:
-    - cron: "20 * * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -15,9 +15,17 @@ concurrency:
 jobs:
   atualizar:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 30
 
     steps:
+      - name: Teste do agendamento
+        run: |
+          echo "Workflow iniciado pelo schedule"
+          echo "UTC:"
+          date -u
+          echo "Brasília:"
+          TZ=America/Sao_Paulo date
+
       - name: Baixar repositório
         uses: actions/checkout@v4
 
