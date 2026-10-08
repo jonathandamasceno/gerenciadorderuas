@@ -2,7 +2,7 @@ name: SPX - Atualizar Staging Areas
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "20 * * * *"
   workflow_dispatch:
 
 permissions:
