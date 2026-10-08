@@ -44,3 +44,4 @@ jobs:
           SEATALK_WEBHOOK: ${{ secrets.SEATALK_WEBHOOK }}
         run: |
           python renovar_cookies.py
+          python main.py
