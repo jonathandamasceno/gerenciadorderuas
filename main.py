@@ -1,6 +1,6 @@
+
 import requests
 import json
-import csv
 import sys
 import os
 
@@ -9,7 +9,7 @@ from googleapiclient.discovery import build
 
 
 # ============================================================
-# CONFIGURAÇÕES SPX
+# CONFIGURAÇÕES
 # ============================================================
 
 SPX_UID = os.getenv("SPX_UID", "")
@@ -19,7 +19,6 @@ SPX_CID = os.getenv("SPX_CID", "BR")
 SPX_ST = os.getenv("SPX_ST", "1")
 SPX_SP_ST = os.getenv("SPX_SP_ST", "1")
 
-# Falha cedo se os cookies essenciais não estiverem configurados no GitHub.
 for nome, valor in {
     "SPX_UID": SPX_UID,
     "SPX_UK": SPX_UK,
@@ -29,29 +28,16 @@ for nome, valor in {
         raise RuntimeError(f"Secret obrigatório não configurado: {nome}")
 
 
-# ============================================================
-# CONFIGURAÇÕES GOOGLE SHEETS
-# ============================================================
+SPREADSHEET_ID = os.getenv(
+    "SPREADSHEET_ID",
+    "1ZZroqMh9XgVv0yrDu1ZzFurREn4zUvCq_0QvHM8h1Io"
+)
 
-SPREADSHEET_ID = os.getenv("SPREADSHEET_ID", "1ZZroqMh9XgVv0yrDu1ZzFurREn4zUvCq_0QvHM8h1Io")
-SHEET_NAME = os.getenv("SHEET_NAME", "Sheet1")
 GOOGLE_CREDENTIALS_JSON = os.getenv("GOOGLE_CREDENTIALS_JSON", "")
 
 
 # ============================================================
-# CONFIGURAÇÕES DA API SPX
-# ============================================================
-
-API_URL = (
-    "https://spx.shopee.com.br/"
-    "api/in-station/outbound/"
-    "outbound_staging_area/config/search"
-)
-
-PAGE_SIZE = 100
-
-# ============================================================
-# HEADERS
+# SESSÃO SPX
 # ============================================================
 
 HEADERS = {
@@ -60,527 +46,202 @@ HEADERS = {
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/154.0.0.0 Safari/537.36"
     ),
-
     "Accept": "application/json, text/plain, */*",
-
     "Content-Type": "application/json",
-
     "Origin": "https://spx.shopee.com.br",
-
-    "Referer": (
-        "https://spx.shopee.com.br/"
-        "#/staging-area-management/list/outbound"
-    ),
-
     "x-csrftoken": SPX_CSRFTOKEN,
 }
 
-
-# ============================================================
-# CRIA SESSION
-# ============================================================
-
 session = requests.Session()
-
 session.headers.update(HEADERS)
 
 
-# ============================================================
-# ADICIONAR COOKIES
-# ============================================================
-
 def adicionar_cookie(nome, valor):
-
-    if not valor:
-        return
-
-    session.cookies.set(
-        nome,
-        valor,
-        domain="spx.shopee.com.br",
-        path="/"
-    )
-
-    session.cookies.set(
-        nome,
-        valor,
-        domain=".spx.shopee.com.br",
-        path="/"
-    )
+    if valor:
+        session.cookies.set(nome, valor, domain="spx.shopee.com.br", path="/")
+        session.cookies.set(nome, valor, domain=".spx.shopee.com.br", path="/")
 
 
-adicionar_cookie(
-    "spx_uid",
-    SPX_UID
-)
-
-adicionar_cookie(
-    "spx_uk",
-    SPX_UK
-)
-
-adicionar_cookie(
-    "spx_cid",
-    SPX_CID
-)
-
-adicionar_cookie(
-    "csrftoken",
-    SPX_CSRFTOKEN
-)
-
-adicionar_cookie(
-    "spx_st",
-    SPX_ST
-)
-
-adicionar_cookie(
-    "spx_sp_st",
-    SPX_SP_ST
-)
+for nome, valor in [
+    ("spx_uid", SPX_UID),
+    ("spx_uk", SPX_UK),
+    ("spx_cid", SPX_CID),
+    ("csrftoken", SPX_CSRFTOKEN),
+    ("spx_st", SPX_ST),
+    ("spx_sp_st", SPX_SP_ST),
+]:
+    adicionar_cookie(nome, valor)
 
 
 # ============================================================
-# CAMPOS QUE SERÃO ENVIADOS PARA A SHEETS
+# CONFIGURAÇÕES DAS DUAS PÁGINAS
 # ============================================================
 
-CAMPOS = {
+PAGINAS = [
+    {
+        "nome": "MAIN - Outbound",
+        "sheet": "Sheet1",
+        "url": "https://spx.shopee.com.br/api/in-station/outbound/outbound_staging_area/config/search",
+        "referer": "https://spx.shopee.com.br/#/staging-area-management/list/outbound",
+        "campos": {
+            "Staging Area Name": "staging_area_name",
+            "Priority": "priority",
+            "TO Destination": "to_destination",
+            "Sorting Plan Group": "sorting_plan_group_list",
+            "Capacity": "capacity",
+            "No. of Cages": "cage_quantity",
+            "No.of TOs": "transport_order_quantity",
+            "No.of Loose Orders": "loose_order_quantity",
+            "Total Orders": "total_order_quantity",
+            "Occupancy Percentage": "occupancy_percentage",
+            "Staged Duration": "staging_duration_time",
+            "Link Camera": "linked_camera",
+            "Status": "staging_area_status",
+            "Editor": "operator",
+            "Update Time": "mtime",
+        },
+    },
+    {
+        "nome": "INBOUND",
+        "sheet": "inbound",
+        "url": "https://spx.shopee.com.br/api/in-station/inbound_staging_area/list",
+        "referer": "https://spx.shopee.com.br/api/in-station/inbound_staging_area/list",
+        "campos": {
+            "Staging Area Name": "area_name",
+            "Priority": "priority",
+            "TO Destination": "to_destination",
+            "Sorting Plan Group": "staging_group_name",
+            "Capacity": "capacity",
+            "No. of Cages": "cage_quantity",
+            "No. of TOs": "to_quantity",
+            "No. of Loose Orders": "loose_order_quantity",
+            "Total Orders": "total_order_quantity",
+            "Occupancy Percentage": "occupy_percentage",
+            "Staged Duration": "staging_duration_time",
+            "Link Camera": "linked_camera",
+            "Status": "status",
+            "Editor": "operator",
+            "Update Time": "update_time",
+        },
+    }
+]
 
-    "Staging Area Name":
-        "staging_area_name",
-
-    "Priority":
-        "priority",
-
-    "TO Destination":
-        "to_destination",
-
-    "Sorting Plan Group":
-        "sorting_plan_group_list",
-
-    "Capacity":
-        "capacity",
-
-    "No. of Cages":
-        "cage_quantity",
-
-    "No.of TOs":
-        "transport_order_quantity",
-
-    "No.of Loose Orders":
-        "loose_order_quantity",
-
-    "Total Orders":
-        "total_order_quantity",
-
-    "Occupancy Percentage":
-        "occupancy_percentage",
-
-    "Staged Duration":
-        "staging_duration_time",
-
-    "Link Camera":
-        "linked_camera",
-
-    "Status":
-        "staging_area_status",
-
-    "Editor":
-        "operator",
-
-    "Update Time":
-        "mtime",
-}
-
-
-# ============================================================
-# CONVERTER VALORES
-# ============================================================
 
 def converter_valor(valor):
-
     if valor is None:
         return ""
-
     if isinstance(valor, (list, dict)):
-
-        return json.dumps(
-            valor,
-            ensure_ascii=False
-        )
-
+        return json.dumps(valor, ensure_ascii=False)
     return valor
 
 
-# ============================================================
-# CONSULTAR UMA PÁGINA DA API
-# ============================================================
+def consultar_pagina(config, pagina):
+    session.headers.update({"Referer": config["referer"]})
 
-def consultar_pagina(pagina):
-
-    payload = {
-        "pageno": pagina,
-        "count": PAGE_SIZE
-    }
-
-    print(
-        f"\nConsultando página {pagina}..."
+    response = session.post(
+        config["url"],
+        json={"pageno": pagina, "count": 100},
+        timeout=60,
     )
-
-    try:
-
-        response = session.post(
-            API_URL,
-            json=payload,
-            timeout=60
-        )
-
-    except requests.exceptions.RequestException as erro:
-
-        print(
-            "\nErro de conexão com a API:"
-        )
-
-        print(erro)
-
-        return None
-
-
-    print(
-        f"HTTP: {response.status_code}"
-    )
-
-
-    # --------------------------------------------------------
-    # VERIFICAR HTTP
-    # --------------------------------------------------------
 
     if response.status_code != 200:
-
-        print("\nA API retornou HTTP diferente de 200; corpo da resposta omitido por segurança.")
-
+        print(f"Erro HTTP {response.status_code} em {config['nome']}")
         return None
 
-
-    # --------------------------------------------------------
-    # CONVERTER PARA JSON
-    # --------------------------------------------------------
-
-    try:
-
-        dados = response.json()
-
-    except Exception:
-
-        print("\nA API retornou uma resposta que não é JSON; corpo omitido por segurança.")
-
-        return None
-
-
-    # --------------------------------------------------------
-    # VERIFICAR RETCODE
-    # --------------------------------------------------------
+    dados = response.json()
 
     if dados.get("retcode") != 0:
-
-        print(
-            "\nAPI retornou erro:"
-        )
-
-        print(
-            json.dumps(
-                dados,
-                ensure_ascii=False,
-                indent=2
-            )
-        )
-
+        print(f"Erro API em {config['nome']}")
+        print(json.dumps(dados, indent=2, ensure_ascii=False))
         return None
-
 
     return dados
 
 
-# ============================================================
-# BUSCAR TODAS AS PÁGINAS
-# ============================================================
+def coletar(config):
+    registros = []
+    pagina = 1
+    total = None
 
-todos_registros = []
+    print(f"\n===== Atualizando {config['nome']} =====")
 
-pagina = 1
+    while True:
+        resposta = consultar_pagina(config, pagina)
 
-total = None
+        if resposta is None:
+            sys.exit(1)
+
+        data = resposta.get("data", {})
+        lista = data.get("list", [])
+
+        if total is None:
+            total = data.get("total", 0)
+
+        if not lista:
+            break
+
+        registros.extend(lista)
+
+        print(f"{config['nome']}: {len(registros)}/{total}")
+
+        if len(registros) >= total:
+            break
+
+        pagina += 1
+
+    dados = []
+    for item in registros:
+        linha = {}
+        for titulo, campo in config["campos"].items():
+            linha[titulo] = converter_valor(item.get(campo, ""))
+        dados.append(linha)
+
+    return dados
 
 
-while True:
+def enviar_sheet(nome_aba, campos, dados):
+    if not GOOGLE_CREDENTIALS_JSON:
+        raise RuntimeError("GOOGLE_CREDENTIALS_JSON não configurado")
 
-    resposta = consultar_pagina(
-        pagina
+    cred = Credentials.from_service_account_info(
+        json.loads(GOOGLE_CREDENTIALS_JSON),
+        scopes=["https://www.googleapis.com/auth/spreadsheets"]
     )
 
+    service = build("sheets", "v4", credentials=cred)
 
-    if resposta is None:
+    valores = [list(campos.keys())]
 
-        print(
-            "\nFalha na consulta."
-        )
+    for linha in dados:
+        valores.append([linha[x] for x in campos.keys()])
 
-        sys.exit(1)
+    service.spreadsheets().values().clear(
+        spreadsheetId=SPREADSHEET_ID,
+        range=f"{nome_aba}!A:O",
+        body={}
+    ).execute()
+
+    service.spreadsheets().values().update(
+        spreadsheetId=SPREADSHEET_ID,
+        range=f"{nome_aba}!A1",
+        valueInputOption="USER_ENTERED",
+        body={"values": valores}
+    ).execute()
+
+    print(f"{nome_aba} atualizado com {len(dados)} registros")
 
 
-    data = resposta.get(
-        "data",
-        {}
+# ============================================================
+# EXECUÇÃO
+# ORDEM: MAIN PRIMEIRO -> INBOUND DEPOIS
+# ============================================================
+
+for pagina in PAGINAS:
+    dados = coletar(pagina)
+    enviar_sheet(
+        pagina["sheet"],
+        pagina["campos"],
+        dados
     )
 
-
-    registros = data.get(
-        "list",
-        []
-    )
-
-
-    # --------------------------------------------------------
-    # PEGAR TOTAL
-    # --------------------------------------------------------
-
-    if total is None:
-
-        total = data.get(
-            "total",
-            0
-        )
-
-        print(
-            f"Total de registros na API: {total}"
-        )
-
-
-    # --------------------------------------------------------
-    # SE NÃO EXISTIREM MAIS REGISTROS
-    # --------------------------------------------------------
-
-    if not registros:
-
-        break
-
-
-    # --------------------------------------------------------
-    # ADICIONAR REGISTROS
-    # --------------------------------------------------------
-
-    todos_registros.extend(
-        registros
-    )
-
-
-    print(
-        f"Recebidos nesta página: {len(registros)}"
-    )
-
-    print(
-        f"Total acumulado: "
-        f"{len(todos_registros)} / {total}"
-    )
-
-
-    # --------------------------------------------------------
-    # VERIFICAR SE TERMINOU
-    # --------------------------------------------------------
-
-    if len(todos_registros) >= total:
-
-        break
-
-
-    pagina += 1
-
-
-# ============================================================
-# FILTRAR SOMENTE OS CAMPOS NECESSÁRIOS
-# ============================================================
-
-dados_filtrados = []
-
-
-for registro in todos_registros:
-
-    linha = {}
-
-
-    for header, campo_api in CAMPOS.items():
-
-        valor = registro.get(
-            campo_api,
-            ""
-        )
-
-
-        linha[header] = converter_valor(
-            valor
-        )
-
-
-    dados_filtrados.append(
-        linha
-    )
-
-
-
-
-# ============================================================
-# CONECTAR AO GOOGLE SHEETS
-# ============================================================
-
-print(
-    "\nConectando ao Google Sheets..."
-)
-
-
-SCOPES = [
-    "https://www.googleapis.com/auth/spreadsheets"
-]
-
-
-if not GOOGLE_CREDENTIALS_JSON:
-    raise RuntimeError("Secret obrigatório não configurado: GOOGLE_CREDENTIALS_JSON")
-
-try:
-    google_info = json.loads(GOOGLE_CREDENTIALS_JSON)
-except json.JSONDecodeError as erro:
-    raise RuntimeError("O secret GOOGLE_CREDENTIALS_JSON não contém um JSON válido.") from erro
-
-credentials = Credentials.from_service_account_info(
-    google_info,
-    scopes=SCOPES
-)
-
-
-service = build(
-    "sheets",
-    "v4",
-    credentials=credentials
-)
-
-
-print(
-    "Google Sheets conectado!"
-)
-
-
-# ============================================================
-# LIMPAR DADOS ANTIGOS
-# ============================================================
-
-print(
-    "\nLimpando dados antigos da planilha..."
-)
-
-
-service.spreadsheets().values().clear(
-    spreadsheetId=SPREADSHEET_ID,
-
-    range=f"{SHEET_NAME}!A:O",
-
-    body={}
-).execute()
-
-
-print(
-    "Dados antigos removidos."
-)
-
-
-# ============================================================
-# PREPARAR DADOS PARA A SHEETS
-# ============================================================
-
-valores_sheets = []
-
-
-# ------------------------------------------------------------
-# CABEÇALHOS
-# ------------------------------------------------------------
-
-valores_sheets.append(
-    list(CAMPOS.keys())
-)
-
-
-# ------------------------------------------------------------
-# DADOS
-# ------------------------------------------------------------
-
-for registro in dados_filtrados:
-
-    linha = []
-
-    for header in CAMPOS.keys():
-
-        linha.append(
-            registro[header]
-        )
-
-    valores_sheets.append(
-        linha
-    )
-
-
-# ============================================================
-# ENVIAR DADOS PARA A GOOGLE SHEETS
-# ============================================================
-
-print(
-    "\nEnviando dados para a Google Sheets..."
-)
-
-
-service.spreadsheets().values().update(
-
-    spreadsheetId=SPREADSHEET_ID,
-
-    range=f"{SHEET_NAME}!A1",
-
-    valueInputOption="USER_ENTERED",
-
-    body={
-        "values": valores_sheets
-    }
-
-).execute()
-
-
-# ============================================================
-# FINAL
-# ============================================================
-
-print(
-    "\n========================================"
-)
-
-print(
-    "          PROCESSO CONCLUÍDO"
-)
-
-print(
-    "========================================"
-)
-
-print(
-    f"Total de registros: "
-    f"{len(dados_filtrados)}"
-)
-
-print(
-    f"Planilha: {SPREADSHEET_ID}"
-)
-
-print(
-    f"Aba: {SHEET_NAME}"
-)
-
-
-
-print(
-    "========================================"
-)
+print("\nPROCESSO FINALIZADO")
