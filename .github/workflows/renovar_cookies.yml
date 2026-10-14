@@ -3,7 +3,7 @@ name: Renovar Cookies SPX
 on:
   workflow_run:
     workflows:
-      - "SPX - Staging Areas Inbound"
+      - "SPX - Atualizar Staging Areas"
     types:
       - completed
   workflow_dispatch:
