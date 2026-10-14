@@ -8,6 +8,12 @@ import logging
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s"
+)
+
+
 if __name__ == "__main__":
     while True:
         logging.info("\n-- Iniciando Atualização --")
