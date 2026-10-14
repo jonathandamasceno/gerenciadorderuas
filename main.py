@@ -10,7 +10,7 @@ from googleapiclient.discovery import build
 
 if __name__ == "__main__":
     while True:
-        logging.log("\n-- Iniciando Atualização --")
+        logging.info("\n-- Iniciando Atualização --")
         # ============================================================
         # CONFIGURAÇÕES
         # ============================================================
@@ -148,14 +148,14 @@ if __name__ == "__main__":
             )
 
             if response.status_code != 200:
-                logging.log(f"Erro HTTP {response.status_code} em {config['nome']}")
+                logging.info(f"Erro HTTP {response.status_code} em {config['nome']}")
                 return None
 
             dados = response.json()
 
             if dados.get("retcode") != 0:
-                logging.log(f"Erro API em {config['nome']}")
-                logging.log(json.dumps(dados, indent=2, ensure_ascii=False))
+                logging.info(f"Erro API em {config['nome']}")
+                logging.info(json.dumps(dados, indent=2, ensure_ascii=False))
                 return None
 
             return dados
@@ -166,7 +166,7 @@ if __name__ == "__main__":
             pagina = 1
             total = None
 
-            logging.log(f"\n===== Atualizando {config['nome']} =====")
+            logging.info(f"\n===== Atualizando {config['nome']} =====")
 
             while True:
                 resposta = consultar_pagina(config, pagina)
@@ -185,7 +185,7 @@ if __name__ == "__main__":
 
                 registros.extend(lista)
 
-                logging.log(f"{config['nome']}: {len(registros)}/{total}")
+                logging.info(f"{config['nome']}: {len(registros)}/{total}")
 
                 if len(registros) >= total:
                     break
@@ -231,7 +231,7 @@ if __name__ == "__main__":
                 body={"values": valores}
             ).execute()
 
-            logging.log(f"{nome_aba} atualizado com {len(dados)} registros")
+            logging.info(f"{nome_aba} atualizado com {len(dados)} registros")
 
 
         # ============================================================
@@ -247,8 +247,8 @@ if __name__ == "__main__":
                 dados
             )
 
-        logging.log("\nPROCESSO FINALIZADO")
+        logging.info("\nPROCESSO FINALIZADO")
 
-        logging.log("\n15min até a próxima Atualização")
+        logging.info("\n15min até a próxima Atualização")
         time.sleep(900)
 
