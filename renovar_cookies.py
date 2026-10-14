@@ -198,55 +198,6 @@ def mudar_secret_github(
 
         return False
 
-
-# ============================================================
-# FUNÇÃO PARA ENVIAR MENSAGEM AO SEATALK
-# ============================================================
-
-def enviar_seatalk(mensagem: str, webhook: str) -> bool:
-
-    if not webhook:
-        print("⚠️ SEATALK_WEBHOOK não foi informado.")
-        return False
-
-    payload = {
-        "tag": "text",
-        "text": {
-            "content": mensagem
-        }
-    }
-
-    try:
-
-        response = requests.post(
-            webhook,
-            json=payload,
-            timeout=30
-        )
-
-        if response.ok:
-
-            print("✅ Mensagem enviada para o SeaTalk.")
-
-            return True
-
-        print(
-            f"❌ Erro ao enviar mensagem para o SeaTalk: "
-            f"{response.status_code} - {response.text}"
-        )
-
-        return False
-
-    except requests.exceptions.RequestException as seatalk_error:
-
-        print(
-            f"❌ Erro de comunicação com o SeaTalk: "
-            f"{seatalk_error}"
-        )
-
-        return False
-
-
 # ============================================================
 # CONFIGURAÇÃO DO SELENIUM / CHROME
 # ============================================================
@@ -329,12 +280,6 @@ try:
         "GITHUB_PAT",
         ""
     )
-
-    SEATALK_WEBHOOK = os.environ.get(
-        "SEATALK_WEBHOOK",
-        ""
-    )
-
 
     # ========================================================
     # 3. VALIDAR CREDENCIAIS
@@ -602,13 +547,6 @@ try:
         "\n" + msg
     )
 
-
-    enviar_seatalk(
-        msg,
-        SEATALK_WEBHOOK
-    )
-
-
 except Exception as e:
 
     print(
@@ -618,15 +556,6 @@ except Exception as e:
     print(
         f"   {str(e)}"
     )
-
-
-    enviar_seatalk(
-        "🚨 ERRO NA AUTOMAÇÃO SPX\n\n"
-        f"❌ {str(e)}\n\n"
-        "Resultado: ❌ PROCESSO NÃO CONCLUÍDO",
-        os.environ.get("SEATALK_WEBHOOK", "")
-    )
-
 
 finally:
 
