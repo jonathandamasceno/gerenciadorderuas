@@ -9,9 +9,6 @@ from googleapiclient.discovery import build
 
 
 while True:
-    print("\n30min até a próxima Atualização")
-    time.sleep(1800)
-
     print("\n-- Iniciando Atualização --")
     # ============================================================
     # CONFIGURAÇÕES
@@ -251,4 +248,5 @@ while True:
 
     print("\nPROCESSO FINALIZADO")
 
-    print("\nAguardando para a próxima atualização")
+    print("\n30min até a próxima Atualização")
+    time.sleep(900)
