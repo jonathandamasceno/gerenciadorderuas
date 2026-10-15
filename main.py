@@ -257,5 +257,5 @@ if __name__ == "__main__":
 
         logging.info("\nPROCESSO FINALIZADO")
 
-        logging.info("\n--- 10min até a próxima Atualização ")
+        logging.info("\n AGUARDANDO NOVA ATUALIZAÇÃO (10min)")
         time.sleep(600)
