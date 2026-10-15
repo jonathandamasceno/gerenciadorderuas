@@ -14,7 +14,7 @@ logging.basicConfig(
 )
 
 START_TIME = time.time()
-DURATION = 121 # (29 MINUTES)
+DURATION = 3540 # 59 MINUTES 
 
 if __name__ == "__main__":
     while time.time() - START_TIME < DURATION: # PRO WORKFLOW NAO PARAR SOZINHO POR CONTA DO TIMEOUT DO YML 
@@ -257,5 +257,5 @@ if __name__ == "__main__":
 
         logging.info("\nPROCESSO FINALIZADO")
 
-        logging.info("\n1min até a próxima Atualização")
-        time.sleep(60)
+        logging.info("\n--- 10min até a próxima Atualização ")
+        time.sleep(600)
