@@ -13,9 +13,11 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
 
+START_TIME = time.time()
+DURATION = 121 # (29 MINUTES)
 
 if __name__ == "__main__":
-    while True:
+    while time.time() - START_TIME < DURATION: # PRO WORKFLOW NAO PARAR SOZINHO POR CONTA DO TIMEOUT DO YML 
         logging.info("\n-- Iniciando Atualização --")
         # ============================================================
         # CONFIGURAÇÕES
@@ -255,6 +257,5 @@ if __name__ == "__main__":
 
         logging.info("\nPROCESSO FINALIZADO")
 
-        logging.info("\n15min até a próxima Atualização")
-        time.sleep(900)
-
+        logging.info("\n1min até a próxima Atualização")
+        time.sleep(60)
