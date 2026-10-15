@@ -1,7 +1,7 @@
 # Workflow SPX — Staging Areas
 
 ## O que faz
-Executa `main.py` e `inbound.py` diariamente às 09:00 no horário de Brasília (12:00 UTC), e também pode ser iniciado manualmente pela aba **Actions** do GitHub.
+Executa `main.py` diariamente e também pode ser iniciado manualmente pela aba **Actions** do GitHub.
 
 ## Configurar no GitHub
 
@@ -13,9 +13,9 @@ Crie estes secrets (os valores não devem ser colocados no código):
 - `SPX_UID`
 - `SPX_UK`
 - `SPX_CSRFTOKEN`
-- `SPX_CID` (por exemplo, `BR`, se aplicável à sua conta)
-- `SPX_ST` (por exemplo, `1`, se aplicável à sua conta)
-- `SPX_SP_ST` (por exemplo, `1`, se aplicável à sua conta)
+- `SPX_CID`
+- `SPX_ST`
+- `SPX_SP_ST`
 - `GOOGLE_CREDENTIALS_JSON`: cole o conteúdo completo do JSON da conta de serviço Google, incluindo `{` e `}`.
 
 ### Repository variables
@@ -24,7 +24,7 @@ Em **Variables**, configure:
 - `SHEET_NAME`: nome da aba, por exemplo `Sheet1`.
 - `SHEET_NAME2`: nome da aba secundária, por exemplo `Sheet1`.
 
-Se não definir as duas variables da planilha, o script usa os valores padrão que estão em `main.py` e em `inbound.py`.
+Se não definir as duas variáveis da planilha, o script usa os valores padrão que estão em `main.py`.
 
 ## Permissões do Google Sheets
 Compartilhe a planilha com o e-mail `client_email` presente no JSON da conta de serviço e conceda permissão de edição. Ative a Google Sheets API no projeto Google Cloud dessa conta.
