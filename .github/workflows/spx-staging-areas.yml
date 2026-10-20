@@ -2,7 +2,7 @@ name: SPX - Atualizar Staging Areas
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 */1 * * *"
   workflow_dispatch:
 
 permissions:
@@ -15,7 +15,7 @@ concurrency:
 jobs:
   atualizar:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 60
 
     steps:
       - name: Teste do agendamento
