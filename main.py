@@ -209,7 +209,6 @@ if __name__ == "__main__":
 
             return dados
 
-
         def enviar_sheet(nome_aba, campos, dados):
             if not GOOGLE_CREDENTIALS_JSON:
                 raise RuntimeError("GOOGLE_CREDENTIALS_JSON não configurado")
@@ -219,7 +218,12 @@ if __name__ == "__main__":
                 scopes=["https://www.googleapis.com/auth/spreadsheets"]
             )
 
-            service = build("sheets", "v4", credentials=cred)
+            service = build(
+                "sheets",
+                "v4",
+                credentials=cred,
+                cache_discovery=False
+            )
 
             valores = [list(campos.keys())]
 
@@ -239,8 +243,9 @@ if __name__ == "__main__":
                 body={"values": valores}
             ).execute()
 
-            logging.info(f"{nome_aba} atualizado com {len(dados)} registros")
-
+            logging.info(
+                f"{nome_aba} atualizado com {len(dados)} registros"
+            )
 
         # ============================================================
         # EXECUÇÃO
